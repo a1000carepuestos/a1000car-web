@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Catálogo de repuestos automotor de A1000Car en Pilar. Encontrá la categoría, marca y modelo de tu vehículo y consultá disponibilidad por WhatsApp.">
+  <title>A1000Car Repuestos | Catálogo automotor en Pilar</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="site-header" id="inicio">
+    <nav class="nav-shell" aria-label="Navegación principal">
+      <a class="brand" href="#inicio" aria-label="A1000Car, ir al inicio">
+        <img src="logo de a1000car.jpg" alt="Logo A1000Car">
+        <span>A1000Car</span>
+      </a>
+      <button class="nav-toggle" type="button" aria-label="Abrir menú" aria-expanded="false" aria-controls="main-navigation">
+        <span></span>
+        <span></span>
+      </button>
+      <div class="nav-links" id="main-navigation">
+        <a href="#inicio">Inicio</a>
+        <a href="#catalogo">Catálogo</a>
+        <a href="#marcas">Marcas</a>
+        <a href="#especiales">Repuestos especiales</a>
+        <a href="#contacto">Contacto</a>
+        <a class="nav-cta js-whatsapp" href="#" target="_blank" rel="noopener">WhatsApp</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero" aria-labelledby="hero-title">
+      <img class="hero-bg" src="imagen local con formula 1.jpeg" alt="Frente del local A1000Car Repuestos en Pilar">
+      <div class="hero-overlay"></div>
+      <div class="hero-content reveal">
+        <p class="eyebrow">A1000Car Repuestos · Pilar</p>
+        <h1 id="hero-title">Repuestos automotor en Pilar</h1>
+        <p class="hero-subtitle">Atención personalizada y un catálogo pensado para ayudarte a encontrar el repuesto correcto.</p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="#catalogo">Explorar catálogo</a>
+          <a class="btn btn-secondary js-whatsapp" href="#" target="_blank" rel="noopener">Consultar por WhatsApp</a>
+        </div>
+        <p class="hero-hint">Para una consulta más precisa, tené a mano marca, modelo, año y motor.</p>
+      </div>
+    </section>
+
+    <section class="catalog-entry" aria-labelledby="catalog-entry-title">
+      <div class="catalog-entry-shell reveal">
+        <div class="catalog-entry-copy">
+          <p class="eyebrow">Encontrá tu repuesto</p>
+          <h2 id="catalog-entry-title">Un recorrido simple, desde el vehículo hasta la pieza</h2>
+          <p>Elegí una categoría, seleccioná la marca y el modelo, y consultá el producto específico por WhatsApp.</p>
+        </div>
+        <ol class="catalog-steps" aria-label="Pasos del catálogo">
+          <li><span>01</span><strong>Categoría</strong></li>
+          <li><span>02</span><strong>Marca y modelo</strong></li>
+          <li><span>03</span><strong>Producto</strong></li>
+        </ol>
+        <a class="btn btn-primary" href="#catalogo">Empezar búsqueda</a>
+      </div>
+    </section>
+
+    <section class="section categories-section" id="catalogo" aria-labelledby="catalog-title">
+      <div class="section-heading reveal">
+        <p class="eyebrow">Catálogo de repuestos</p>
+        <h2 id="catalog-title">Explorá por sistema del vehículo</h2>
+        <p>Seleccioná una línea de repuestos y después elegí la marca y el modelo de tu vehículo.</p>
+      </div>
+
+      <div class="category-grid">
+        <article class="category-card reveal" data-card-link="catalogo-categoria.html?categoria=frenos">
+          <div class="category-body">
+            <div class="category-header">
+              <span class="category-icon" aria-hidden="true"><svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="15"></circle><circle cx="24" cy="24" r="5"></circle><path d="M24 9v7M24 32v7M9 24h7M32 24h7M14 14l5 5M29 29l5 5M34 14l-5 5M19 29l-5 5"></path></svg></span>
+              <h3>Frenos</h3>
+            </div>
+            <p>Pastillas, discos, campanas, bombas y cilindros de rueda.</p>
+            <a class="catalog-card-link" href="catalogo-categoria.html?categoria=frenos">Explorar categoría</a>
+          </div>
+        </article>
+
+        <article class="category-card reveal" data-card-link="catalogo-categoria.html?categoria=suspension">
+          <div class="category-body">
+            <div class="category-header">
+              <span class="category-icon" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M28 5 16 17M32 9 20 21M15 18l15 15M12 25l11 11M25 12l11 11M9 36l3 3M36 9l3 3"></path><path d="m18 30-6 6M30 18l6-6"></path></svg></span>
+              <h3>Suspensión y dirección</h3>
+            </div>
+            <p>Amortiguadores, espirales, parrillas, bujes, mazas, bieletas, rótulas, extremos y axiales de dirección.</p>
+            <a class="catalog-card-link" href="catalogo-categoria.html?categoria=suspension">Explorar categoría</a>
+          </div>
+        </article>
+
+        <article class="category-card reveal" data-card-link="catalogo-categoria.html?categoria=transmision">
+          <div class="category-body">
+            <div class="category-header">
+              <span class="category-icon" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M7 24h34M13 18l-6 6 6 6M35 18l6 6-6 6"></path><circle cx="18" cy="24" r="5"></circle><circle cx="30" cy="24" r="5"></circle></svg></span>
+              <h3>Transmisión</h3>
+            </div>
+            <p>Homocinéticas, fuelles, embrague, rulemanes y cables de comando.</p>
+            <a class="catalog-card-link" href="catalogo-categoria.html?categoria=transmision">Explorar categoría</a>
+          </div>
+        </article>
+
+        <article class="category-card reveal" data-card-link="catalogo-categoria.html?categoria=encendido">
+          <div class="category-body">
+            <div class="category-header">
+              <span class="category-icon" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M28 4 14 26h10l-4 18 14-24H24l4-16Z"></path></svg></span>
+              <h3>Encendido y electrónica</h3>
+            </div>
+            <p>Bobinas, bujías, cables, sensores, bulbos, relés y módulos electrónicos.</p>
+            <a class="catalog-card-link" href="catalogo-categoria.html?categoria=encendido">Explorar categoría</a>
+          </div>
+        </article>
+
+        <article class="category-card reveal" data-card-link="catalogo-categoria.html?categoria=refrigeracion">
+          <div class="category-body">
+            <div class="category-header">
+              <span class="category-icon" aria-hidden="true"><svg viewBox="0 0 48 48"><rect x="10" y="9" width="28" height="30" rx="3"></rect><path d="M16 14v20M22 14v20M28 14v20M34 14v20M7 17h3M7 31h3M38 17h3M38 31h3"></path></svg></span>
+              <h3>Refrigeración</h3>
+            </div>
+            <p>Radiadores, electroventiladores, termostatos, mangueras, depósitos y tapones.</p>
+            <a class="catalog-card-link" href="catalogo-categoria.html?categoria=refrigeracion">Explorar categoría</a>
+          </div>
+        </article>
+
+        <article class="category-card reveal" data-card-link="catalogo-categoria.html?categoria=motor">
+          <div class="category-body">
+            <div class="category-header">
+              <span class="category-icon" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M16 18h18l5 6v10H14l-5-5v-7l5-4Z"></path><path d="M20 18v-5h9v5M24 13V8M12 26H6M39 28h4M18 34v5M32 34v5"></path></svg></span>
+              <h3>Motor y juntas</h3>
+            </div>
+            <p>Juntas, distribución, bombas y soportes de motor.</p>
+            <a class="catalog-card-link" href="catalogo-categoria.html?categoria=motor">Explorar categoría</a>
+          </div>
+        </article>
+
+        <article class="category-card reveal" data-card-link="catalogo-categoria.html?categoria=filtros">
+          <div class="category-body">
+            <div class="category-header">
+              <span class="category-icon" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M13 8h22l-3 32H16L13 8Z"></path><path d="M16 14h16M18 20h12M18 26h12M19 32h10"></path></svg></span>
+              <h3>Filtros</h3>
+            </div>
+            <p>Filtros de aceite, aire, combustible y habitáculo.</p>
+            <a class="catalog-card-link" href="catalogo-categoria.html?categoria=filtros">Explorar categoría</a>
+          </div>
+        </article>
+
+        <article class="category-card reveal" data-card-link="catalogo-categoria.html?categoria=baterias">
+          <div class="category-body">
+            <div class="category-header">
+              <span class="category-icon" aria-hidden="true"><svg viewBox="0 0 48 48"><rect x="8" y="15" width="30" height="20" rx="3"></rect><path d="M38 22h3v6h-3M16 12h6M26 12h6M15 25h8M19 21v8M28 25h6"></path></svg></span>
+              <h3>Baterías</h3>
+            </div>
+            <p>Baterías para distintos vehículos. La elección depende de medidas, capacidad, polaridad y aplicación.</p>
+            <a class="catalog-card-link" href="catalogo-categoria.html?categoria=baterias">Explorar categoría</a>
+          </div>
+        </article>
+
+        <article class="category-card category-card-wide reveal" data-card-link="catalogo-productos.html?categoria=universales">
+          <div class="category-body">
+            <div class="category-header">
+              <span class="category-icon" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M24 7v34M7 24h34M12 12l24 24M36 12 12 36"></path><circle cx="24" cy="24" r="15"></circle></svg></span>
+              <h3>Productos universales</h3>
+            </div>
+            <p>Productos de uso frecuente que pueden ser compatibles con distintos vehículos. Consultanos para confirmar el tipo y la aplicación correcta.</p>
+            <a class="catalog-card-link" href="catalogo-productos.html?categoria=universales">Ver productos universales</a>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section vehicle-brands-section" id="marcas" aria-labelledby="vehicle-brands-title">
+      <div class="section-heading reveal">
+        <p class="eyebrow">Marcas de vehículos</p>
+        <h2 id="vehicle-brands-title">Elegí la marca para encontrar tu modelo</h2>
+        <p>Estas son las marcas más consultadas. La disponibilidad se verifica según modelo y stock del momento.</p>
+      </div>
+      <div class="vehicle-logo-grid reveal">
+        <div class="vehicle-logo-card"><img src="assets/logos-marcas/chevrolet.png" alt="Chevrolet" loading="lazy"><span>Chevrolet</span></div>
+        <div class="vehicle-logo-card"><img src="assets/logos-marcas/fiat.png" alt="Fiat" loading="lazy"><span>Fiat</span></div>
+        <div class="vehicle-logo-card"><img src="assets/logos-marcas/ford.png" alt="Ford" loading="lazy"><span>Ford</span></div>
+        <div class="vehicle-logo-card"><img src="assets/logos-marcas/peugeot.png" alt="Peugeot" loading="lazy"><span>Peugeot</span></div>
+        <div class="vehicle-logo-card"><img src="assets/logos-marcas/renault.png" alt="Renault" loading="lazy"><span>Renault</span></div>
+        <div class="vehicle-logo-card"><img src="assets/logos-marcas/volkswagen.png" alt="Volkswagen" loading="lazy"><span>Volkswagen</span></div>
+        <div class="vehicle-logo-card"><img src="assets/logos-marcas/toyota.png" alt="Toyota" loading="lazy"><span>Toyota</span></div>
+        <div class="vehicle-logo-card"><img src="assets/logos-marcas/honda.png" alt="Honda" loading="lazy"><span>Honda</span></div>
+        <div class="vehicle-logo-card"><img src="assets/logos-marcas/nissan.png" alt="Nissan" loading="lazy"><span>Nissan</span></div>
+        <div class="vehicle-logo-card"><img src="assets/logos-marcas/audi.png" alt="Audi" loading="lazy"><span>Audi</span></div>
+      </div>
+    </section>
+
+    <section class="section parts-brands-section" aria-labelledby="parts-brands-title">
+      <div class="section-heading reveal">
+        <p class="eyebrow">Marcas de repuestos</p>
+        <h2 id="parts-brands-title">Marcas reconocidas para distintas líneas del vehículo</h2>
+        <p>La disponibilidad de marcas puede variar según el repuesto, el vehículo y el stock del momento.</p>
+      </div>
+      <div class="parts-brand-grid reveal" aria-label="Marcas de repuestos disponibles habitualmente">
+        <span>Sachs</span><span>Fric-Rot</span><span>Monroe</span><span>Bosch</span><span>Valeo</span>
+        <span>Wega</span><span>Mahle</span><span>Magneti Marelli</span><span>Partson</span><span>Willard</span>
+        <span>Dayco</span><span>Dexco</span><span>TRW</span><span>SKF</span><span>Mazfren</span><span>NGK</span>
+      </div>
+    </section>
+
+    <section class="section special-section" id="especiales" aria-labelledby="special-title">
+      <div class="special-shell reveal">
+        <div class="special-marker" aria-hidden="true"><span>+</span></div>
+        <div class="special-copy">
+          <p class="eyebrow">Repuestos especiales</p>
+          <h2 id="special-title">¿Buscás un repuesto difícil de conseguir?</h2>
+          <p>También contamos con algunas piezas para vehículos de años anteriores y repuestos menos comunes. La disponibilidad es limitada y puede variar, por lo que recomendamos consultarnos por WhatsApp.</p>
+        </div>
+        <a class="btn btn-primary js-whatsapp" href="#" data-wa-message="Hola A1000Car, estoy buscando un repuesto difícil de conseguir o para un vehículo de años anteriores.&#10;&#10;Marca:&#10;Modelo:&#10;Año:&#10;Motor:&#10;Repuesto que busco:&#10;Foto o código de la pieza (si lo tengo):&#10;&#10;Muchas gracias." target="_blank" rel="noopener">Consultar un repuesto especial</a>
+      </div>
+    </section>
+
+    <section class="section availability-section" aria-labelledby="availability-title">
+      <div class="availability-panel reveal">
+        <div>
+          <p class="eyebrow">Stock y disponibilidad</p>
+          <h2 id="availability-title">¿No encontrás el repuesto en el catálogo?</h2>
+          <p>El catálogo muestra algunas de nuestras principales líneas, pero no representa la totalidad de los productos disponibles en el local. También contamos con piezas pequeñas, accesorios y otros repuestos que pueden no aparecer publicados. Consultanos por WhatsApp para verificar disponibilidad.</p>
+        </div>
+        <a class="btn btn-outline js-whatsapp" href="#" data-wa-message="Hola A1000Car, estoy buscando un repuesto que no vi en la página.&#10;&#10;Marca del vehículo:&#10;Modelo:&#10;Año:&#10;Motor:&#10;Repuesto que busco:&#10;Foto o código de la pieza:&#10;&#10;Muchas gracias." target="_blank" rel="noopener">Consultar otro repuesto</a>
+      </div>
+    </section>
+
+    <section class="section contact-section" id="contacto" aria-labelledby="contact-title">
+      <div class="contact-shell reveal">
+        <div class="contact-heading">
+          <p class="eyebrow">Contacto y ubicación</p>
+          <h2 id="contact-title">Hablemos del repuesto que necesitás</h2>
+          <p class="contact-lead">Para recibir una atención más precisa, enviá marca, modelo, año, motor y, si la tenés, una foto o código de la pieza.</p>
+        </div>
+        <div class="contact-layout">
+          <div class="contact-info">
+            <div class="contact-detail"><span>Dirección</span><strong>Fragata La Argentina 1305</strong><p>Pilar, Buenos Aires</p></div>
+            <div class="contact-detail"><span>Horarios</span><strong>Lunes a Viernes · 9:00 a 18:00 hs</strong><p>Sábados · 9:00 a 17:00 hs</p></div>
+            <div class="contact-detail"><span>WhatsApp</span><strong>+54 9 11 3547-4814</strong><p>Consultas de compatibilidad, precio y disponibilidad.</p></div>
+            <div class="contact-detail"><span>Instagram</span><strong>@a1000carepuestos</strong><p>Novedades y contacto con el local.</p></div>
+          </div>
+          <div class="map-card">
+            <iframe title="Ubicación de A1000Car Repuestos" src="https://www.google.com/maps?q=Fragata%20La%20Argentina%201305%2C%20Pilar%2C%20Buenos%20Aires%2C%20Argentina&amp;output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+          </div>
+        </div>
+        <div class="contact-actions">
+          <a class="btn btn-primary js-whatsapp" href="#" target="_blank" rel="noopener">Consultar por WhatsApp</a>
+          <a class="btn btn-outline" href="https://www.instagram.com/a1000carepuestos/" target="_blank" rel="noopener">Ver Instagram</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-brand">
+      <img src="logo de a1000car.jpg" alt="Logo A1000Car">
+      <div><strong>A1000Car Repuestos</strong><p>Fragata La Argentina 1305, Pilar, Buenos Aires</p></div>
+    </div>
+    <nav class="footer-links" aria-label="Navegación del pie de página">
+      <a href="#catalogo">Catálogo</a><a href="#marcas">Marcas</a><a href="#especiales">Repuestos especiales</a><a href="#contacto">Contacto</a>
+    </nav>
+    <p class="copyright">Copyright 2026 A1000Car Repuestos. Todos los derechos reservados.</p>
+  </footer>
+
+  <a class="floating-whatsapp js-whatsapp" href="#" target="_blank" rel="noopener" aria-label="Consultar por WhatsApp"><span>WhatsApp</span></a>
+  <script src="script.js"></script>
+</body>
+</html>

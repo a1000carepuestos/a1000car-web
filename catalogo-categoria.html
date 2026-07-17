@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>A1000Car | Catálogo por categoría</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="site-header inner-header">
+    <nav class="nav-shell" aria-label="Navegación principal">
+      <a class="brand" href="index.html#inicio" aria-label="A1000Car inicio">
+        <img src="logo de a1000car.jpg" alt="Logo A1000Car">
+        <span>A1000Car</span>
+      </a>
+      <button class="nav-toggle" type="button" aria-label="Abrir menú" aria-expanded="false" aria-controls="main-navigation">
+        <span></span>
+        <span></span>
+      </button>
+      <div class="nav-links" id="main-navigation">
+        <a href="index.html#inicio">Inicio</a>
+        <a href="index.html#catalogo">Catálogo</a>
+        <a href="index.html#marcas">Marcas</a>
+        <a href="index.html#especiales">Repuestos especiales</a>
+        <a href="index.html#contacto">Contacto</a>
+        <a class="nav-cta js-whatsapp" href="#" target="_blank" rel="noopener">WhatsApp</a>
+      </div>
+    </nav>
+  </header>
+
+  <main class="catalog-page">
+    <section class="catalog-flow-section">
+      <div class="catalog-flow-shell reveal">
+        <nav class="breadcrumb" aria-label="Ruta del catálogo">
+          <a href="index.html#inicio">Inicio</a>
+          <a href="index.html#catalogo">Catálogo</a>
+          <strong data-category-name>Categoría</strong>
+        </nav>
+
+        <div class="catalog-title-row">
+          <span class="catalog-icon" aria-hidden="true"></span>
+          <div>
+            <p class="eyebrow">Catálogo</p>
+            <h1 data-category-name>Categoría</h1>
+            <p>Elegí la marca de tu vehículo para ver los modelos disponibles en el catálogo. La compatibilidad y el stock se confirman por WhatsApp.</p>
+          </div>
+        </div>
+
+        <section class="choice-block">
+          <h2>Elegí la marca de tu vehículo</h2>
+          <div class="choice-grid" data-local-brands></div>
+        </section>
+
+        <section class="choice-block">
+          <h2>Importados</h2>
+          <div class="choice-grid imported-grid" data-imported-brands></div>
+        </section>
+
+        <div class="catalog-note">
+          <strong>¿No encontrás tu marca?</strong>
+          <span>Consultanos por WhatsApp y te ayudamos a verificar compatibilidad y disponibilidad.</span>
+          <a class="js-whatsapp" href="#" target="_blank" rel="noopener">Consultar</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <a class="floating-whatsapp js-whatsapp" href="#" target="_blank" rel="noopener" aria-label="Consultar por WhatsApp">
+    <span>WhatsApp</span>
+  </a>
+
+  <script src="catalogo.js"></script>
+  <script src="script.js"></script>
+  <script src="catalogo-flow.js"></script>
+</body>
+</html>

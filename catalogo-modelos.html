@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>A1000Car | Modelos del vehículo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="site-header inner-header">
+    <nav class="nav-shell" aria-label="Navegación principal">
+      <a class="brand" href="index.html#inicio" aria-label="A1000Car inicio">
+        <img src="logo de a1000car.jpg" alt="Logo A1000Car">
+        <span>A1000Car</span>
+      </a>
+      <button class="nav-toggle" type="button" aria-label="Abrir menú" aria-expanded="false" aria-controls="main-navigation">
+        <span></span>
+        <span></span>
+      </button>
+      <div class="nav-links" id="main-navigation">
+        <a href="index.html#inicio">Inicio</a>
+        <a href="index.html#catalogo">Catálogo</a>
+        <a href="index.html#marcas">Marcas</a>
+        <a href="index.html#especiales">Repuestos especiales</a>
+        <a href="index.html#contacto">Contacto</a>
+        <a class="nav-cta js-whatsapp" href="#" target="_blank" rel="noopener">WhatsApp</a>
+      </div>
+    </nav>
+  </header>
+
+  <main class="catalog-page">
+    <section class="catalog-flow-section">
+      <div class="catalog-flow-shell reveal">
+        <nav class="breadcrumb" aria-label="Ruta del catálogo">
+          <a href="index.html#inicio">Inicio</a>
+          <a href="index.html#catalogo">Catálogo</a>
+          <a data-category-link href="#">Categoría</a>
+          <strong data-brand-name>Marca</strong>
+        </nav>
+
+        <div class="catalog-title-row">
+          <span class="brand-mark brand-heading-logo" data-brand-logo aria-hidden="true"></span>
+          <div>
+            <p class="eyebrow" data-category-name>Categoría</p>
+            <h1 data-brand-name>Marca</h1>
+            <p>Elegí el modelo para ver los productos de esta categoría y consultar compatibilidad, precio orientativo y disponibilidad.</p>
+          </div>
+        </div>
+
+        <section class="choice-block">
+          <h2>Elegí el modelo de tu vehículo</h2>
+          <div class="choice-grid models-grid" data-models></div>
+          <div class="catalog-note is-hidden" data-model-empty>
+            <strong>Modelos en preparación</strong>
+            <span>Todavía estamos cargando modelos para esta marca. Podés consultarnos por WhatsApp y te ayudamos con el repuesto.</span>
+            <a class="js-whatsapp" href="#" target="_blank" rel="noopener">Consultar por WhatsApp</a>
+          </div>
+        </section>
+
+        <div class="catalog-note">
+          <strong>Los modelos pueden variar según año, versión y motorización.</strong>
+          <span>Confirmamos compatibilidad y stock por WhatsApp antes de avanzar.</span>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <a class="floating-whatsapp js-whatsapp" href="#" target="_blank" rel="noopener" aria-label="Consultar por WhatsApp">
+    <span>WhatsApp</span>
+  </a>
+
+  <script src="catalogo.js"></script>
+  <script src="script.js"></script>
+  <script src="catalogo-flow.js"></script>
+</body>
+</html>
