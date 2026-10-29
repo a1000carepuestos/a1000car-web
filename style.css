@@ -774,6 +774,32 @@ p {
   transform: translateY(-2px);
 }
 
+/* Dynamic catalog states and media; the existing layout remains unchanged. */
+[hidden] { display: none !important; }
+.catalog-loading, .catalog-state { grid-column: 1 / -1; }
+.catalog-loading { padding: 28px 0; color: var(--muted); }
+.catalog-state { padding: 28px 0; border-block: 1px solid var(--line); }
+.catalog-state h2 { font-size: 24px; }
+.catalog-state p { color: var(--muted); }
+.catalog-state .catalog-actions { margin: 22px 0 0; }
+.catalog-state button { font: inherit; cursor: pointer; }
+.catalog-title-row h1, .choice-card strong, .product-content h2 { overflow-wrap: anywhere; }
+.vehicle-logo-slot { display: grid; width: 112px; height: 58px; place-items: center; }
+.image-fallback { color: var(--muted); font-size: 13px; text-align: center; }
+.product-image-slot { display: grid; width: 100%; min-width: 0; height: 240px; place-items: center; }
+.product-image-slot img { display: block; width: 100%; height: 100%; object-fit: contain; object-position: center; }
+.product-sku, .product-compatibility { margin-bottom: 10px; color: var(--muted); font-size: 14px; }
+.product-stock { align-self: flex-start; padding: 4px 8px; border-radius: 4px; font-size: 13px; font-weight: 700; }
+.stock-available { background: #eaf5ee; color: #23633a; }
+.stock-outOfStock { background: #f9eded; color: #8b3030; }
+.stock-check { background: var(--surface-blue); color: var(--blue-dark); }
+.type-choice > span:last-child:not(.catalog-icon) { color: var(--muted); font-size: 14px; }
+.catalog-page .catalog-title-row h1 { font-size: 36px; }
+@media (max-width: 600px) {
+  .catalog-page .catalog-title-row h1 { font-size: 30px; }
+  .catalog-actions .btn { width: 100%; white-space: normal; text-align: center; }
+}
+
 /* Catálogo interno */
 .catalog-page {
   min-height: 100vh;

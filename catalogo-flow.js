@@ -1,374 +1,265 @@
-const params = new URLSearchParams(window.location.search);
-const data = window.CATALOG_DATA;
-const ORIENTATIVE_PRICE = data.orientativePrice;
+import {fetchVisibleProducts} from "./sanity-client.mjs";
+import {prepareProducts, categoriesOf, inCategory, brandsOf, modelsOf, forVehicle, typesOf, findEntity, findCategory, categoryKey, directCategory, catalogHref, formatPrice, compatibilityText, productMessage} from "./catalogo-data.mjs";
 
-const normalize = (value) => (value || "").trim();
-const requestedCategory = normalize(params.get("categoria"));
-const categoryAlias = { fluidos: "universales" };
-const normalizedCategory = categoryAlias[requestedCategory] || requestedCategory;
-const categoryKey = data.categories[normalizedCategory] ? normalizedCategory : "frenos";
-const category = data.categories[categoryKey];
-const requestedBrand = normalize(params.get("marca"));
-const availableBrands = [...data.localBrands, ...data.importedBrands];
-const brandName = availableBrands.includes(requestedBrand) ? requestedBrand : "";
-const requestedModel = normalize(params.get("modelo"));
-const modelName = (data.models[brandName] || []).includes(requestedModel) ? requestedModel : "";
+const assets = window.CATALOG_PRESENTATION;
+const home = document.querySelector("[data-catalog-categories]");
+const shell = document.querySelector(".catalog-flow-shell");
+const root = home || shell;
+const params = new URLSearchParams(location.search);
+const normalize = (value) => String(value || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+const localValue = (map, name) => Object.entries(map || {}).find(([key]) => normalize(key) === normalize(name))?.[1];
 
-const setText = (selector, text) => {
-  document.querySelectorAll(selector).forEach((node) => {
-    node.textContent = text;
+function el(tag, className = "", text) {
+  const node = document.createElement(tag);
+  if (className) node.className = className;
+  if (text !== undefined) node.textContent = text;
+  return node;
+}
+function link(text, href, className = "") {
+  const node = el("a", className, text);
+  node.href = href;
+  return node;
+}
+function icon(category, className = "catalog-icon") {
+  const node = el("span", className);
+  node.setAttribute("aria-hidden", "true");
+  // Only trusted SVG strings from the existing local asset registry enter HTML.
+  node.innerHTML = assets.icons[categoryKey(category)] || assets.icons.filtros;
+  return node;
+}
+function safeImage(value) {
+  if (typeof value !== "string") return "";
+  if (/^assets\//.test(value)) return value;
+  try {
+    const url = new URL(value);
+    return url.protocol === "https:" && url.hostname === "cdn.sanity.io" ? url.href : "";
+  } catch { return ""; }
+}
+function imageSlot(sources, alt, className, fallbackText) {
+  const slot = el("span", className);
+  const urls = [...new Set(sources.map(safeImage).filter(Boolean))];
+  const fallback = () => slot.replaceChildren(el("span", "image-fallback", fallbackText));
+  const next = () => {
+    const url = urls.shift();
+    if (!url) { fallback(); return; }
+    const img = el("img");
+    img.alt = alt;
+    img.loading = "lazy";
+    img.addEventListener("error", next, {once: true});
+    img.src = url;
+    slot.replaceChildren(img);
+  };
+  next();
+  return slot;
+}
+function whatsapp(text = "Consultar por WhatsApp", message) {
+  const node = link(text, "#", "btn btn-primary js-whatsapp");
+  if (message) node.dataset.waMessage = message;
+  node.target = "_blank";
+  node.rel = "noopener";
+  return node;
+}
+function note(text) {
+  const node = el("div", "catalog-note");
+  node.append(el("span", "", text));
+  return node;
+}
+function state(title, message, retry = false) {
+  const block = el("div", "catalog-state");
+  block.setAttribute("role", retry ? "alert" : "status");
+  block.append(el("h2", "", title), el("p", "", message));
+  const actions = el("div", "catalog-actions");
+  if (retry) {
+    const button = el("button", "btn btn-outline", "Reintentar");
+    button.type = "button";
+    button.addEventListener("click", load);
+    actions.append(button);
+  }
+  if (!home) actions.append(link("Volver al catálogo", "index.html#catalogo", "btn btn-outline"));
+  actions.append(whatsapp());
+  block.append(actions);
+  root.replaceChildren(block);
+}
+function breadcrumbs(items) {
+  const nav = el("nav", "breadcrumb");
+  nav.setAttribute("aria-label", "Ruta del catálogo");
+  const all = [{name: "Inicio", href: "index.html#inicio"}, {name: "Catálogo", href: "index.html#catalogo"}, ...items];
+  all.forEach((item, index) => {
+    const node = index === all.length - 1 ? el("strong", "", item.name) : link(item.name, item.href);
+    if (index === all.length - 1) node.setAttribute("aria-current", "page");
+    nav.append(node);
   });
-};
-
-const setHref = (selector, href) => {
-  document.querySelectorAll(selector).forEach((node) => {
-    node.href = href;
-  });
-};
-
-const setCategoryPresentation = () => {
-  document.querySelectorAll(".catalog-icon").forEach((node) => {
-    node.innerHTML = data.icons[categoryKey] || "";
-  });
-};
-
-const whatsappTemplate = (intro, includePhoto = false) => `${intro}
-
-Marca del vehículo:
-Modelo:
-Año:
-Motor:
-Repuesto que busco:${includePhoto ? "\nFoto o código de la pieza:" : ""}
-
-Muchas gracias.`;
-
-const productWhatsappMessage = (product, brand, model) => {
-  if (categoryKey === "encendido") {
-    if (product.messageType === "rele") {
-      return `Hola A1000Car, quiero consultar por un relé para mi vehículo.
-
-Marca:
-Modelo:
-Año:
-Función del relé o número de patas, si lo conozco:
-Foto o código, si lo tengo:
-
-Quiero confirmar el modelo correcto, precio y stock.
-
-Muchas gracias.`;
-    }
-
-    if (product.messageType === "destellador") {
-      return `Hola A1000Car, quiero consultar por un destellador para mi vehículo.
-
-Marca:
-Modelo:
-Año:
-Cantidad de patas o foto de la pieza, si la tengo:
-
-Quiero confirmar compatibilidad, precio y stock.
-
-Muchas gracias.`;
-    }
-
-    const detailLine = product.messageType === "bulbo"
-      ? "Foto o ficha del bulbo, si la tengo:"
-      : "Foto o código de la pieza, si lo tengo:";
-    return `Hola A1000Car, quiero consultar por ${product.name.toLowerCase()} para ${brand} ${model}.
-
-Año:
-Motor:
-Versión, si la conozco:
-${detailLine}
-
-Quiero confirmar compatibilidad, conexión, precio y stock.
-
-Muchas gracias.`;
-  }
-
-  if (categoryKey === "universales" && product.section === "Iluminación") {
-    return `Hola A1000Car, quiero consultar por una lámpara para mi vehículo.
-
-Función que necesito:
-Luz alta / luz baja / alta y baja / posición / giro / freno / otra
-
-Marca del vehículo:
-Modelo:
-Año:
-
-Quiero confirmar el tipo correcto, precio y stock.
-
-Muchas gracias.`;
-  }
-
-  if (category.directProducts) {
-    return `Hola A1000Car, quiero consultar por ${product.name.toLowerCase()}.
-
-Producto:
-Presentación o cantidad que necesito:
-Vehículo, si corresponde:
-
-Quiero confirmar el tipo, precio y stock.
-
-Muchas gracias.`;
-  }
-
-  return `Hola A1000Car, quiero consultar por ${product.name.toLowerCase()} para ${brand} ${model}.
-
-Año:
-Motor:
-Versión, si la conozco:
-
-Quiero confirmar compatibilidad, precio y stock.
-
-Muchas gracias.`;
-};
-
-const productCard = (product, brand, model) => {
-  const article = document.createElement("article");
-  article.className = "product-card";
-  const vehicleLine = category.directProducts ? "Producto de uso frecuente" : `${brand} ${model}`;
-  const availabilityText = categoryKey === "encendido"
-    ? "El modelo y la conexión pueden variar según el año, motor y versión del vehículo."
-    : categoryKey === "universales" && product.section === "Iluminación"
-      ? "El tipo de lámpara puede variar según el vehículo y la óptica instalada."
-      : category.directProducts
-        ? "La compatibilidad depende de la presentación, la aplicación y el vehículo si corresponde."
-        : "El precio puede variar según año, versión, motor, marca disponible y stock.";
-  const buttonText = category.directProducts
-    ? "Consultar precio y stock"
-    : categoryKey === "encendido"
-      ? "Consultar precio y compatibilidad"
-      : "Consultar precio y disponibilidad";
-
-  article.innerHTML = `
-    <div class="product-media" aria-hidden="true">
-      <span class="product-line-icon">${data.icons[categoryKey] || ""}</span>
-      <span>Imagen próximamente</span>
-    </div>
-    <div class="product-content">
-      <h2>${product.name}</h2>
-      <p class="product-vehicle">${vehicleLine}</p>
-      ${product.description ? `<p class="product-description">${product.description}</p>` : ""}
-      ${product.type ? `<p class="product-type">${product.type}</p>` : ""}
-      <div class="product-price">
-        <span>Precio orientativo</span>
-        <strong>${ORIENTATIVE_PRICE}</strong>
-        <small class="product-price-note">El precio puede variar según la marca, modelo, versión y fabricante del repuesto. Consultanos para recibir una cotización actualizada.</small>
-      </div>
-      <p class="product-disclaimer">${availabilityText}</p>
-      <a class="btn btn-primary js-whatsapp" href="#" data-wa-message="${productWhatsappMessage(product, brand, model).replaceAll('"', "&quot;")}" target="_blank" rel="noopener">${buttonText}</a>
-    </div>
-  `;
-  return article;
-};
-
-const renderProductGroups = (products, brand, model, container) => {
-  const groups = new Map();
-  products.forEach((product) => {
-    const groupName = product.section || "Repuestos disponibles";
-    if (!groups.has(groupName)) groups.set(groupName, []);
-    groups.get(groupName).push(product);
-  });
-
-  container.innerHTML = "";
-  groups.forEach((groupProducts, groupName) => {
-    const group = document.createElement("section");
-    group.className = "product-group";
-    if (category.directProducts || groups.size > 1) {
-      const heading = document.createElement("h2");
-      heading.className = "product-group-title";
-      heading.textContent = groupName;
-      group.appendChild(heading);
-    }
-
-    const grid = document.createElement("div");
-    grid.className = "product-grid";
-    groupProducts.forEach((product) => grid.appendChild(productCard(product, brand, model)));
-    group.appendChild(grid);
-    container.appendChild(group);
-  });
-};
-
-const brandCard = (brand) => {
-  const link = document.createElement("a");
-  link.className = "choice-card brand-choice";
-  link.href = `catalogo-modelos.html?categoria=${encodeURIComponent(categoryKey)}&marca=${encodeURIComponent(brand)}`;
-  const logo = data.brandLogos?.[brand] || "";
-  link.innerHTML = `
-    <span class="brand-logo-slot">
-      <img src="${logo}" alt="Logo ${brand}" loading="lazy">
-      <span class="brand-logo-fallback">${brand}</span>
-    </span>
-    <strong>${brand}</strong>
-  `;
-  const img = link.querySelector("img");
-  img.addEventListener("error", () => {
-    link.classList.add("logo-missing");
-    img.remove();
-  });
-  return link;
-};
-
-const modelCard = (model) => {
-  const link = document.createElement("a");
-  link.className = "choice-card model-choice";
-  link.href = `catalogo-productos.html?categoria=${encodeURIComponent(categoryKey)}&marca=${encodeURIComponent(brandName)}&modelo=${encodeURIComponent(model)}`;
-  const image = data.modelImages?.[brandName]?.[model] || "";
-
-  link.innerHTML = image
-    ? `
-      <span class="model-image-frame">
-        <img src="${image}" alt="${brandName} ${model}" loading="lazy">
-      </span>
-      <strong>${model}</strong>
-    `
-    : `
-      <span class="model-silhouette" aria-hidden="true">
-        <span class="car-body"></span>
-        <span class="car-window"></span>
-        <span class="car-wheel wheel-left"></span>
-        <span class="car-wheel wheel-right"></span>
-      </span>
-      <strong>${model}</strong>
-    `;
-
-  const img = link.querySelector("img");
-  if (img) {
-    img.addEventListener("error", () => {
-      link.classList.add("model-image-missing");
-      link.innerHTML = `
-        <span class="model-silhouette" aria-hidden="true">
-          <span class="car-body"></span>
-          <span class="car-window"></span>
-          <span class="car-wheel wheel-left"></span>
-          <span class="car-wheel wheel-right"></span>
-        </span>
-        <strong>${model}</strong>
-      `;
-    });
-  }
-  return link;
-};
-
-const renderCategoryPage = () => {
-  if (category.directProducts) {
-    window.location.href = `catalogo-productos.html?categoria=${encodeURIComponent(categoryKey)}`;
-    return;
-  }
-
-  setText("[data-category-name]", category.title);
-  setCategoryPresentation();
-  document.title = `A1000Car | ${category.title}`;
-
-  const localGrid = document.querySelector("[data-local-brands]");
-  const importedGrid = document.querySelector("[data-imported-brands]");
-  const categoryContact = document.querySelector(".catalog-note .js-whatsapp");
-
-  if (localGrid) data.localBrands.forEach((brand) => localGrid.appendChild(brandCard(brand)));
-  if (importedGrid) data.importedBrands.forEach((brand) => importedGrid.appendChild(brandCard(brand)));
-  if (categoryContact) {
-    categoryContact.dataset.waMessage = whatsappTemplate(category.message, true);
-  }
-};
-
-const renderModelsPage = () => {
-  if (!brandName) {
-    window.location.replace(`catalogo-categoria.html?categoria=${encodeURIComponent(categoryKey)}`);
-    return;
-  }
-
-  const brand = brandName;
-  const models = data.models[brand] || [];
-  const categoryHref = `catalogo-categoria.html?categoria=${encodeURIComponent(categoryKey)}`;
-
-  setText("[data-category-name]", category.title);
-  setText("[data-brand-name]", brand);
-  setCategoryPresentation();
-  document.querySelectorAll("[data-brand-logo]").forEach((node) => {
-    const logo = data.brandLogos?.[brand] || "";
-    node.innerHTML = `<img src="${logo}" alt="Logo ${brand}" loading="lazy"><span>${brand}</span>`;
-    const img = node.querySelector("img");
-    img.addEventListener("error", () => {
-      node.classList.add("logo-missing");
-      img.remove();
-    });
-  });
-  setHref("[data-category-link]", categoryHref);
-  document.title = `A1000Car | ${brand} ${category.title}`;
-
-  const modelGrid = document.querySelector("[data-models]");
-  const emptyState = document.querySelector("[data-model-empty]");
-  const emptyContact = emptyState?.querySelector(".js-whatsapp");
-
-  if (modelGrid && models.length) {
-    models.forEach((model) => modelGrid.appendChild(modelCard(model)));
-  } else if (emptyState) {
-    emptyState.classList.remove("is-hidden");
-  }
-  if (emptyContact) {
-    emptyContact.dataset.waMessage = `${category.message}
-
-Marca del vehículo: ${brand}
-Modelo:
-Año:
-Motor:
-Repuesto que busco:
-Foto o código de la pieza:
-
-Muchas gracias.`;
-  }
-};
-
-const renderProductsPage = () => {
-  if (!category.directProducts && (!brandName || !modelName)) {
-    const fallback = brandName
-      ? `catalogo-modelos.html?categoria=${encodeURIComponent(categoryKey)}&marca=${encodeURIComponent(brandName)}`
-      : `catalogo-categoria.html?categoria=${encodeURIComponent(categoryKey)}`;
-    window.location.replace(fallback);
-    return;
-  }
-
-  const brand = brandName || "Marca";
-  const model = modelName || "Modelo";
-  const categoryHref = `catalogo-categoria.html?categoria=${encodeURIComponent(categoryKey)}`;
-  const brandHref = `catalogo-modelos.html?categoria=${encodeURIComponent(categoryKey)}&marca=${encodeURIComponent(brand)}`;
-  const products = data.products?.[categoryKey] || [];
-  const title = category.directProducts ? category.title : `${category.title} para ${brand} ${model}`;
-
-  setText("[data-category-name]", category.title);
-  setText("[data-brand-name]", brand);
-  setText("[data-model-name]", model);
-  setText("[data-product-title]", title);
-  setCategoryPresentation();
-  setHref("[data-category-link]", categoryHref);
-  setHref("[data-brand-link]", brandHref);
+  shell.append(nav);
+}
+function heading(category, title, description, brand) {
+  const row = el("div", "catalog-title-row");
+  row.append(brand
+    ? imageSlot([brand.logoUrl, localValue(assets.brandLogos, brand.name)], `Logo ${brand.name}`, "brand-mark brand-heading-logo", brand.name)
+    : icon(category));
+  const copy = el("div");
+  copy.append(el("p", "eyebrow", category.name), el("h1", "", title), el("p", "", description));
+  row.append(copy);
+  shell.append(row);
   document.title = `A1000Car | ${title}`;
-
-  const productGrid = document.querySelector("[data-products]");
-  const backToModels = document.querySelector("[data-back-to-models]");
-
-  if (category.directProducts) {
-    setText("[data-product-eyebrow]", "Productos universales");
-    setText("[data-product-intro]", "Elegí el producto que necesitás y consultanos para confirmar el tipo, la aplicación, el precio orientativo y el stock.");
-    document.querySelector("[data-universal-note]")?.classList.remove("is-hidden");
-    document.querySelectorAll("[data-brand-link], [data-model-name]").forEach((node) => node.remove());
-    document.querySelectorAll("[data-category-link]").forEach((node) => {
-      const current = document.createElement("strong");
-      current.textContent = category.title;
-      node.replaceWith(current);
-    });
-    if (backToModels) backToModels.href = "index.html#catalogo";
-    if (backToModels) backToModels.textContent = "Volver al catálogo";
-  } else if (backToModels) {
-    backToModels.href = brandHref;
+}
+function choiceBlock(title, cards, gridClass = "") {
+  if (!cards.length) return;
+  const section = el("section", "choice-block");
+  section.append(el("h2", "", title));
+  const grid = el("div", `choice-grid ${gridClass}`);
+  grid.append(...cards);
+  section.append(grid);
+  shell.append(section);
+}
+function renderHome(products) {
+  const categories = categoriesOf(products);
+  home.replaceChildren();
+  categories.forEach((category) => {
+    const rows = inCategory(products, category);
+    const direct = directCategory(rows);
+    const href = catalogHref(direct ? "catalogo-productos.html" : "catalogo-categoria.html", {category});
+    const card = el("article", "category-card");
+    const body = el("div", "category-body");
+    const header = el("div", "category-header");
+    header.append(icon(category, "category-icon"), el("h3", "", category.name));
+    body.append(header, el("p", "", category.description || typesOf(rows).map((type) => type.name).join(", ") + "."), link(direct ? "Ver productos universales" : "Explorar categoría", href, "catalog-card-link"));
+    card.append(body);
+    card.addEventListener("click", (event) => { if (!event.target.closest("a")) location.href = href; });
+    home.append(card);
+  });
+  const brandGrid = document.querySelector(".vehicle-logo-grid");
+  const brands = brandsOf(products);
+  document.querySelector(".vehicle-brands-section").hidden = !brands.length;
+  brandGrid.replaceChildren(...brands.map((brand) => {
+    const card = el("div", "vehicle-logo-card");
+    card.append(imageSlot([brand.logoUrl, localValue(assets.brandLogos, brand.name)], `Logo ${brand.name}`, "vehicle-logo-slot", "Logo no disponible"), el("span", "", brand.name));
+    return card;
+  }));
+  if (!categories.length) state("El catálogo se está actualizando", "No hay productos publicados para mostrar en este momento. Consultanos por el repuesto que necesitás.");
+}
+function renderBrands(category, products) {
+  if (directCategory(products)) { location.replace(catalogHref("catalogo-productos.html", {category})); return; }
+  breadcrumbs([{name: category.name}]);
+  heading(category, category.name, "Elegí la marca de tu vehículo. La compatibilidad y el stock se confirman por WhatsApp.");
+  const card = (brand) => {
+    const node = link("", catalogHref("catalogo-modelos.html", {category, brand}), "choice-card brand-choice");
+    node.append(imageSlot([brand.logoUrl, localValue(assets.brandLogos, brand.name)], `Logo ${brand.name}`, "brand-logo-slot", "Logo no disponible"), el("strong", "", brand.name));
+    return node;
+  };
+  const brands = brandsOf(products);
+  choiceBlock("Elegí la marca de tu vehículo", brands.filter((brand) => brand.group !== "imported").map(card));
+  choiceBlock("Importados", brands.filter((brand) => brand.group === "imported").map(card), "imported-grid");
+  if (products.some((product) => product.isUniversal)) {
+    shell.append(link("Ver productos universales", catalogHref("catalogo-productos.html", {category, universal: true}), "btn btn-outline"));
   }
-
-  if (productGrid) renderProductGroups(products, brand, model, productGrid);
-};
-
-if (document.querySelector("[data-local-brands]")) renderCategoryPage();
-if (document.querySelector("[data-models]")) renderModelsPage();
-if (document.querySelector("[data-product-title]")) renderProductsPage();
-
-if (window.updateWhatsappLinks) window.updateWhatsappLinks();
+  shell.append(note("¿No encontrás tu marca? Consultanos por WhatsApp para verificar compatibilidad y disponibilidad."));
+}
+function renderModels(category, brand, products) {
+  breadcrumbs([{name: category.name, href: catalogHref("catalogo-categoria.html", {category})}, {name: brand.name}]);
+  heading(category, brand.name, "Elegí el modelo de tu vehículo para encontrar el tipo de repuesto que necesitás.", brand);
+  choiceBlock("Elegí el modelo de tu vehículo", modelsOf(products, brand).map((model) => {
+    const card = link("", catalogHref("catalogo-productos.html", {category, brand, model}), "choice-card model-choice");
+    const localModels = localValue(assets.modelImages, brand.name);
+    card.append(imageSlot([model.imageUrl, localValue(localModels, model.name)], `${brand.name} ${model.name}`, "model-image-frame", "Imagen no disponible"), el("strong", "", model.name));
+    return card;
+  }), "models-grid");
+  shell.append(note("La aplicación puede variar según año, versión y motorización. Confirmamos compatibilidad y stock por WhatsApp."));
+}
+function productCard(product, category, brand, model) {
+  const article = el("article", "product-card");
+  article.dataset.productId = product._id;
+  const photo = product.photos.find((image) => safeImage(image?.url));
+  const media = el("div", "product-media");
+  if (photo) media.append(imageSlot([photo.url], photo.alt || product.name, "product-image-slot", "Imagen no disponible"));
+  else media.append(icon(category, "product-line-icon"), el("span", "", "Imagen no disponible"));
+  const body = el("div", "product-content");
+  body.append(el("h2", "", product.name), el("p", "product-type", product.partBrand?.name || "Marca a confirmar"));
+  if (product.sku) body.append(el("p", "product-sku", `Código: ${product.sku}`));
+  body.append(el("p", "product-vehicle", brand && model ? `${brand.name} ${model.name}` : "Producto de uso frecuente · Confirmar aplicación"));
+  if (product.description) body.append(el("p", "product-description", product.description));
+  if (brand && model) {
+    const details = [...new Set(product.compatibilities.filter((c) => c.vehicleBrand._id === brand._id && c.vehicleModel._id === model._id).map(compatibilityText).filter(Boolean))];
+    details.forEach((text) => body.append(el("p", "product-compatibility", text)));
+  }
+  const stockText = {available: "Disponible · Confirmar stock", outOfStock: "Sin stock", check: "Consultar disponibilidad"};
+  body.append(el("p", `product-stock stock-${["available", "outOfStock"].includes(product.stockStatus) ? product.stockStatus : "check"}`, stockText[product.stockStatus] || stockText.check));
+  const price = el("div", "product-price");
+  price.append(el("span", "", "Precio orientativo · ARS"), el("strong", "", formatPrice(product.priceArs)), el("small", "product-price-note", "El precio puede variar según la marca, modelo, versión y fabricante del repuesto. Consultanos para recibir una cotización actualizada."));
+  body.append(price, el("p", "product-disclaimer", product.isUniversal ? "La aplicación debe confirmarse según el vehículo y el producto." : "Confirmá año, motor y versión para verificar la compatibilidad."), whatsapp("Consultar precio y disponibilidad", productMessage(product, brand, model)));
+  article.append(media, body);
+  return article;
+}
+function renderProducts(category, products, brand, model) {
+  const direct = directCategory(products) || params.get("universales") === "1";
+  const selected = direct ? products.filter((p) => p.isUniversal) : forVehicle(products, brand, model);
+  const types = typesOf(selected);
+  const requestedType = params.get("tipo");
+  const type = requestedType ? findEntity(types, requestedType) : null;
+  if (requestedType && !type) { state("Tipo de repuesto no disponible", "No hay productos visibles para esta selección."); return; }
+  if (!selected.length) { state("Sin productos para esta selección", "Consultanos por WhatsApp para verificar otras opciones."); return; }
+  const crumbs = [{name: category.name, href: catalogHref("catalogo-categoria.html", {category})}];
+  if (!direct) crumbs.push({name: brand.name, href: catalogHref("catalogo-modelos.html", {category, brand})}, {name: model.name, href: catalogHref("catalogo-productos.html", {category, brand, model})});
+  if (type) crumbs.push({name: type.name});
+  breadcrumbs(crumbs);
+  heading(category, direct ? category.name : type ? `${type.name} para ${brand.name} ${model.name}` : `${brand.name} ${model.name}`, direct || type ? "Consultanos para confirmar compatibilidad, marca disponible, precio y stock." : "Elegí el tipo de repuesto que necesitás para tu vehículo.");
+  const actions = el("div", "catalog-actions");
+  if (!direct) {
+    actions.append(link("Volver a elegir modelo", catalogHref("catalogo-modelos.html", {category, brand}), "btn btn-outline"));
+    if (type) actions.append(link("Elegir otro tipo de repuesto", catalogHref("catalogo-productos.html", {category, brand, model}), "btn btn-outline"));
+  } else actions.append(link("Volver al catálogo", "index.html#catalogo", "btn btn-outline"));
+  shell.append(actions);
+  if (!direct && !type) {
+    choiceBlock("Elegí el tipo de repuesto", types.map((item) => {
+      const card = link("", catalogHref("catalogo-productos.html", {category, brand, model, type: item}), "choice-card type-choice");
+      card.append(icon(category), el("strong", "", item.name));
+      if (item.description) card.append(el("span", "", item.description));
+      return card;
+    }));
+  } else {
+    (type ? [type] : types).forEach((item) => {
+      const section = el("section", "product-group");
+      if (direct) section.append(el("h2", "product-group-title", item.name));
+      const grid = el("div", "product-grid");
+      grid.append(...selected.filter((p) => p.partType._id === item._id).map((p) => productCard(p, category, direct ? null : brand, direct ? null : model)));
+      section.append(grid);
+      shell.append(section);
+    });
+    if (direct) shell.append(note("Que un producto sea de uso frecuente no significa que sea compatible con todos los vehículos. Consultanos con marca, modelo y año para confirmar la opción correcta."));
+    shell.append(note("Los precios son orientativos y pueden variar según año, versión, motor, fabricante y disponibilidad del momento."));
+  }
+}
+function renderInternal(products) {
+  const category = findCategory(categoriesOf(products), params.get("categoria"));
+  if (!category) { state("Categoría no disponible", "No hay productos visibles para esta categoría. Podés volver al catálogo o consultarnos."); return; }
+  const rows = inCategory(products, category);
+  if (location.pathname.endsWith("catalogo-categoria.html")) { renderBrands(category, rows); return; }
+  if (directCategory(rows) || params.get("universales") === "1") { renderProducts(category, rows); return; }
+  const brand = findEntity(brandsOf(rows), params.get("marca"));
+  if (!brand) { state("Marca no disponible", "No hay productos visibles para esta marca y categoría."); return; }
+  if (location.pathname.endsWith("catalogo-modelos.html")) { renderModels(category, brand, rows); return; }
+  const model = findEntity(modelsOf(rows, brand), params.get("modelo"));
+  if (!model) { state("Modelo no disponible", "No hay productos visibles para este modelo y categoría."); return; }
+  renderProducts(category, rows, brand, model);
+}
+async function load() {
+  if (!root) return;
+  root.setAttribute("aria-busy", "true");
+  const loading = el("p", "catalog-loading", "Cargando catálogo…");
+  loading.setAttribute("role", "status");
+  root.replaceChildren(loading);
+  // Do not leave the institutional brand list suggesting stale catalog options.
+  if (home) document.querySelector(".vehicle-brands-section").hidden = true;
+  try {
+    const products = prepareProducts(await fetchVisibleProducts());
+    root.replaceChildren();
+    if (home) renderHome(products);
+    else renderInternal(products);
+  } catch (error) {
+    console.error("No se pudo cargar el catálogo de Sanity:", error);
+    state("No pudimos cargar el catálogo", "Probá nuevamente en unos momentos o consultanos por WhatsApp.", true);
+  } finally {
+    root.setAttribute("aria-busy", "false");
+    window.updateWhatsappLinks?.();
+  }
+}
+load();

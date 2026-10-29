@@ -1,0 +1,15 @@
+.local-qa/
+/ESTADO-PROYECTO.md
+
+# Local environment and credentials
+.env
+.env.*
+!.env.example
+.npmrc
+credentials.json
+credentials.*.json
+service-account*.json
+*.pem
+*.key
+*.p12
+*.pfx
