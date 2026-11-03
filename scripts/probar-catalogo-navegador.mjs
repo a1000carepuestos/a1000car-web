@@ -3,6 +3,7 @@ import {createRequire} from "node:module";
 import {mkdir} from "node:fs/promises";
 import {resolve} from "node:path";
 import {fixture, universal, brand, model} from "../tests/catalogo-fixtures.mjs";
+import {formatPrice} from "../catalogo-data.mjs";
 
 const require = createRequire(import.meta.url);
 const {chromium} = require("playwright");
@@ -35,10 +36,15 @@ try {
     const ctx = await context();
     try {
       const page = await newPage(ctx);
+      let catalogRequests = 0;
+      page.on("request", (request) => { if (request.url().startsWith("https://d4ku4bhi.api.sanity.io/")) catalogRequests++; });
       const responsePromise = page.waitForResponse((r) => r.url().startsWith("https://d4ku4bhi.api.sanity.io/"), {timeout: 20000});
       await visit(page);
       const response = await responsePromise;
       assert.equal(response.status(), 200);
+      const received = (await response.json()).result;
+      const product = received.find((item) => item.sku === "TEST-BOSCH-001");
+      assert.ok(product, "Debe existir el producto de prueba esperado");
       const requestHeaders = await response.request().allHeaders();
       assert.equal(requestHeaders.origin, new URL(base).origin);
       assert.equal(requestHeaders.authorization, undefined);
@@ -64,13 +70,21 @@ try {
       assert.equal(await card.count(), 1);
       assert.match(await card.innerText(), /Pastillas de freno delanteras Bosch/);
       assert.match(await card.innerText(), /BOSCH/);
-      assert.match(await card.innerText(), /1\.000/);
+      assert.equal(await card.locator(".product-price strong").innerText(), formatPrice(product.priceArs));
       assert.match(await card.innerText(), /2005–2012.*Motor 1\.6/);
       const wa = new URL(await card.locator(".js-whatsapp").getAttribute("href"));
       assert.equal(wa.pathname, "/5491135474814");
       assert.match(wa.searchParams.get("text"), /Chevrolet Corsa/);
       assert.doesNotMatch(wa.searchParams.get("text"), /categoría/);
       assert.equal(await page.locator(".breadcrumb a").count(), 5);
+      assert.equal(catalogRequests, 1, "El recorrido completo debe reutilizar una consulta");
+      const refreshedResponse = page.waitForResponse((r) => r.url().startsWith("https://d4ku4bhi.api.sanity.io/"));
+      await page.reload({waitUntil: "domcontentloaded"});
+      await ready(page);
+      const refreshedProduct = (await (await refreshedResponse).json()).result.find((item) => item._id === product._id);
+      assert.equal(await page.locator(".product-price strong").innerText(), formatPrice(refreshedProduct.priceArs));
+      assert.equal(catalogRequests, 2, "Recargar debe consultar otra vez");
+      console.log("Consultas reales: 1 por recorrido completo; 2 después de recargar.");
       await checkLayout(page);
       await screenshot(page, "productos-desktop");
       await page.setViewportSize({width: 390, height: 844});

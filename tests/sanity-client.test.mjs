@@ -16,6 +16,7 @@ test("solicita solo productos visibles y publicados sin credenciales", async () 
   assert.match(VISIBLE_PRODUCTS_QUERY, /publicationStatus == "visible"/);
   assert.match(VISIBLE_PRODUCTS_QUERY, /!\(_id in path\("drafts\.\*\*"\)\)/);
   assert.equal(request.options.credentials, "omit");
+  assert.equal(request.options.cache, "no-store");
   assert.equal(request.options.headers.Authorization, undefined);
   assert.deepEqual(result, [product]);
 });

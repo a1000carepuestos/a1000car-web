@@ -34,6 +34,7 @@ export async function fetchVisibleProducts({fetchImpl = globalThis.fetch, signal
   const response = await fetchImpl(url.toString(), {
     method: "GET",
     credentials: "omit",
+    cache: "no-store",
     headers: {Accept: "application/json"},
     signal: signal ?? AbortSignal.timeout(15000),
   });

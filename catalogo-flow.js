@@ -1,4 +1,5 @@
-import {fetchVisibleProducts} from "./sanity-client.mjs";
+import {loadCatalogProducts} from "./catalogo-cache.mjs";
+import {productImageUrl} from "./catalogo-images.mjs";
 import {prepareProducts, categoriesOf, inCategory, brandsOf, modelsOf, forVehicle, typesOf, findEntity, findCategory, categoryKey, directCategory, catalogHref, formatPrice, compatibilityText, productMessage} from "./catalogo-data.mjs";
 
 const assets = window.CATALOG_PRESENTATION;
@@ -170,7 +171,7 @@ function productCard(product, category, brand, model) {
   article.dataset.productId = product._id;
   const photo = product.photos.find((image) => safeImage(image?.url));
   const media = el("div", "product-media");
-  if (photo) media.append(imageSlot([photo.url], photo.alt || product.name, "product-image-slot", "Imagen no disponible"));
+  if (photo) media.append(imageSlot([productImageUrl(photo.url)], photo.alt || product.name, "product-image-slot", "Imagen no disponible"));
   else media.append(icon(category, "product-line-icon"), el("span", "", "Imagen no disponible"));
   const body = el("div", "product-content");
   body.append(el("h2", "", product.name), el("p", "product-type", product.partBrand?.name || "Marca a confirmar"));
@@ -250,7 +251,7 @@ async function load() {
   // Do not leave the institutional brand list suggesting stale catalog options.
   if (home) document.querySelector(".vehicle-brands-section").hidden = true;
   try {
-    const products = prepareProducts(await fetchVisibleProducts());
+    const products = prepareProducts(await loadCatalogProducts());
     root.replaceChildren();
     if (home) renderHome(products);
     else renderInternal(products);
@@ -263,3 +264,4 @@ async function load() {
   }
 }
 load();
+window.addEventListener("pageshow", (event) => { if (event.persisted) load(); });
