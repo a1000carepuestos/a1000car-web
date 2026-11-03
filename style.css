@@ -231,7 +231,7 @@ p {
 }
 
 .hero-overlay {
-  background: linear-gradient(90deg, rgba(5, 8, 12, 0.94) 0%, rgba(5, 8, 12, 0.78) 48%, rgba(5, 8, 12, 0.34) 100%);
+  background: linear-gradient(90deg, rgba(5, 8, 12, 0.84) 0%, rgba(5, 8, 12, 0.66) 42%, rgba(5, 8, 12, 0.28) 74%, rgba(5, 8, 12, 0.14) 100%);
 }
 
 .hero-content {
@@ -239,6 +239,75 @@ p {
   z-index: 2;
   width: min(1180px, 100%);
   margin-inline: auto;
+}
+
+/* Hero motion stays on compositor-friendly properties, without scroll handlers. */
+.hero-bg {
+  transform-origin: center;
+  animation: hero-ken-burns 20s ease-in-out infinite alternate both;
+}
+
+.hero-content.reveal {
+  opacity: 1;
+  transform: none;
+  transition: none;
+}
+
+.hero-content h1,
+.hero-content .hero-subtitle,
+.hero-content .hero-actions,
+.hero-content .hero-hint {
+  animation: hero-copy-in 700ms cubic-bezier(0.2, 0.7, 0.3, 1) both;
+}
+
+.hero-content h1 { animation-delay: 120ms; }
+.hero-content .hero-subtitle { animation-delay: 320ms; }
+.hero-content .hero-actions { animation-delay: 520ms; }
+.hero-content .hero-hint { animation-delay: 650ms; }
+.hero-content .hero-actions:focus-within { animation: none; }
+
+@keyframes hero-ken-burns {
+  from { transform: scale(1); }
+  to { transform: scale(1.05); }
+}
+
+@keyframes hero-copy-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes hero-depth {
+  from { translate: 0 0; }
+  to { translate: 0 16px; }
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) and (min-width: 1024px) and (hover: hover) and (pointer: fine) {
+    .hero { view-timeline-name: --a1000car-hero; view-timeline-axis: block; }
+    .hero-bg {
+      animation-name: hero-ken-burns, hero-depth;
+      animation-duration: 20s, auto;
+      animation-timing-function: ease-in-out, linear;
+      animation-iteration-count: infinite, 1;
+      animation-direction: alternate, normal;
+      animation-fill-mode: both, both;
+      animation-timeline: auto, --a1000car-hero;
+      animation-range: normal, exit 0% exit 100%;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-bg,
+  .hero-content h1,
+  .hero-content .hero-subtitle,
+  .hero-content .hero-actions,
+  .hero-content .hero-hint {
+    animation: none !important;
+    opacity: 1;
+    transform: none;
+    translate: none;
+  }
 }
 
 .hero-content h1 {
@@ -1301,11 +1370,11 @@ p {
   }
 
   .hero-bg {
-    object-position: 55% center;
+    object-position: 50% center;
   }
 
   .hero-overlay {
-    background: linear-gradient(180deg, rgba(5, 8, 12, 0.72) 0%, rgba(5, 8, 12, 0.94) 72%);
+    background: linear-gradient(180deg, rgba(5, 8, 12, 0.50) 0%, rgba(5, 8, 12, 0.66) 36%, rgba(5, 8, 12, 0.82) 100%);
   }
 
   .hero-content h1 {
